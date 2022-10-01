@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="list" type="id" />
+    <item name="registration_button" type="id" />
+    <item name="repeat_password_text" type="id" />
+    <item name="logo" type="id" />
+</resources>
