@@ -17,8 +17,9 @@ class SmileChatAdapter: RecyclerView.Adapter<SmileChatAdapter.SmileChatViewHolde
             notifyDataSetChanged()
         }
 
-    fun addSmileMessage(smileMessageEntity: SmileMessageEntity){
-        list.add(smileMessageEntity)
+    fun setSmileMessage(l: List<SmileMessageEntity>){
+        list.clear()
+        list.addAll(l)
         Log.d("test",list.size.toString())
         notifyDataSetChanged()
     }
@@ -57,7 +58,7 @@ class SmileChatAdapter: RecyclerView.Adapter<SmileChatAdapter.SmileChatViewHolde
 
 
         fun bind(smileMessageEntity: SmileMessageEntity) = with(binding){
-            binding.textView.setText("test")
+            binding.textView.setText("${smileMessageEntity.sender_id} : ${smileMessageEntity.emo}")
           //textView2.setText("test")
         }
     }

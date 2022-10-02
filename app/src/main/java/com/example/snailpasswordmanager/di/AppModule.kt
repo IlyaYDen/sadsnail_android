@@ -31,10 +31,5 @@ class AppModule(val context: Context) {
         return SmileChatViewModel(useCases)
     }
 
-    @Provides
-    @Singleton
-    fun provideIdentityStory(): IdentityStory {
-        return IdentityStory()
-    }
 }
 

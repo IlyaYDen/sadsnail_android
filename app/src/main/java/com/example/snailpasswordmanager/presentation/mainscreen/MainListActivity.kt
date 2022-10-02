@@ -2,30 +2,31 @@ package com.example.snailpasswordmanager.presentation.mainscreen
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.JsonReader
 import android.util.Log
-import android.widget.EditText
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.snailpasswordmanager.PasswordApp
-import com.example.snailpasswordmanager.R
 import com.example.snailpasswordmanager.databinding.ActivityMainListBinding
-import com.example.snailpasswordmanager.di.IdentityStory
+import com.example.snailpasswordmanager.di.IdentityStore
 import com.example.snailpasswordmanager.domain.model.ChatEntity
-import kotlinx.coroutines.launch
+import com.example.snailpasswordmanager.presentation.AdduserChat.AddUserChatActivity
+import com.google.gson.*
+import org.json.JSONArray
 import org.json.JSONObject
+import java.io.StringReader
+import java.lang.reflect.Type
 import javax.inject.Inject
 
 
 class MainListActivity @Inject constructor(
-    val identityStory: IdentityStory
 ) : AppCompatActivity() {
 
     lateinit var bindingClass : ActivityMainListBinding
@@ -34,6 +35,7 @@ class MainListActivity @Inject constructor(
     @Inject
     lateinit var vmFactory: MainListViewModelFactory
 
+
     private lateinit var viewModel : MainListViewModel
     private val adapter :PasswordListAdapter = PasswordListAdapter()
 
@@ -41,37 +43,49 @@ class MainListActivity @Inject constructor(
         super.onResume()
         adapter.setPasswords(viewModel.getChats())
 
+        val url = "http://${IdentityStore.ip}/chats?login=${IdentityStore.login}"
 
-        val url = "http://192.168.43.85:5000/users"
-        var login = identityStory.login
-        val params = HashMap<String,String>()
-        params["login"] = login
-        val jsonObject = (params as Map<*, *>?)?.let { JSONObject(it) }
+        Log.d("test", "gggg")
         var t = Volley.newRequestQueue(this)
-
-        val request = JsonObjectRequest(
-            Request.Method.GET,url,jsonObject,
+        val str = StringRequest(Request.Method.GET,
+            url,
             { response ->
-                // Process the json
-                try {
-                    Log.d("test", "$response")
-                    
-                }catch (e:Exception){
-                    Log.d("test", "$e")
+                Log.d("test","resp $response")
+                val obj = JSONObject("$response")
+                if(response.contains("\"status\": 404")){
+
+                } else {
+                    val jsonObj = JSONObject(response)
+                    val s =  jsonObj.getJSONArray("chats")
+                    for(a in 0..(s.length()-1)) {
+                        //Log.d("test",s.get(a).toString())
+                        adapter.addPassword(ChatEntity(s.get(a).toString()))
+                    }
+
+                    //var gson = Gson()
+                    //val t = gson.fromJson(response, String::class.java)
                 }
+            /*else {
+                    val obj = JSONObject(response)
+                    val foodJson = obj.getJSONArray("chats")
+                    Log.d("test",foodJson.toString())
+                    //for(a in 0..foodJson.length()){
+                    //    Log.d("test",foodJson.getString(a))
+                    //}
+                    //val data = obj.optJSONArray("chats")?.
+                    //let { it } // returns an array of JSONObject
+                         // transforms each JSONObject of the array into Foo
 
-            }, {
-                // Error in request
-                //a.setText("Exception: $it")
-                Log.d("test", "$it")
-            })
-
-
-
-        t.add(request)
-
+                }*/
+            },
+            {
+                Log.d("test","er $it")
+            }
+        )
+        t.add(str)
 
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,14 +113,17 @@ class MainListActivity @Inject constructor(
 
 
         bindingClass.ButtonAdd.setOnClickListener {
-
-            adapter.addPassword(ChatEntity
-                    (
-                service = "",
-                login = "",
-                timestamp = 1,
-                password = ""
-            ))
+            val intent = Intent(this, AddUserChatActivity::class.java).apply {
+                //putExtra("EXTRA_MESSAGE", "")
+            }
+            startActivity(intent)
+            //adapter.addPassword(ChatEntity
+            //        (
+            //    service = "",
+            //    login = "",
+            //    timestamp = 1,
+            //    password = ""
+            //))
         }
     }
     private fun init() {
@@ -127,3 +144,15 @@ class MainListActivity @Inject constructor(
 
     }*/
 }
+/*
+class StringDeserializer : JsonDeserializer<String> {
+
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): String? {
+        val jsonObj = json as JsonObject
+        val jsonWeatherArray = jsonObj.getAsJsonArray()
+        jsonWeatherArray.get()
+
+        return jsonObj
+
+    }
+}*/

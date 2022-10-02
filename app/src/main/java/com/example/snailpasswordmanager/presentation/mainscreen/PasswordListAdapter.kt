@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.example.snailpasswordmanager.R
 import com.example.snailpasswordmanager.databinding.ChatItemBinding
+import com.example.snailpasswordmanager.di.IdentityStore
 import com.example.snailpasswordmanager.domain.model.ChatEntity
 import com.example.snailpasswordmanager.presentation.smilechat.SmileChatActivity
 
@@ -47,11 +48,12 @@ class PasswordListAdapter: RecyclerView.Adapter<PasswordListAdapter.PasswordItem
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, SmileChatActivity::class.java).apply {
-                putExtra("MODE", true)
-                putExtra("SERVICE", list.get(position).service)
-                putExtra("LOGIN", list.get(position).login)
-                putExtra("PASSWORD", list.get(position).password)
-                putExtra("ID", list.get(position).id)
+                //putExtra("MODE", true)
+                //putExtra("SERVICE", list.get(position).service)
+                //putExtra("LOGIN", list.get(position).login)
+                //putExtra("PASSWORD", list.get(position).password)
+                //putExtra("ID", list.get(position).id)
+                IdentityStore.loginM = list.get(position).login
             }
             holder.itemView.context.startActivity(intent)
             /*val intent = Intent(holder.itemView.context, PasswordItemActivity::class.java).apply {
@@ -81,7 +83,7 @@ class PasswordListAdapter: RecyclerView.Adapter<PasswordListAdapter.PasswordItem
     class PasswordItemViewHolder(view: View): RecyclerView.ViewHolder(view){
         val binding = ChatItemBinding.bind(view)
         fun bind(passwordEntity: ChatEntity) = with(binding){
-            textView2.setText("test")
+            textView2.setText(passwordEntity.login)
         }
     }
 }
